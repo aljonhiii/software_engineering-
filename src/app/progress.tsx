@@ -27,7 +27,11 @@ import { StepProgress } from '../components/progress';
 import { ProgressRing, Card } from '../components/common';
 import { formatTime } from '../utils';
 import { MachineStatus } from '../types';
-import { startCleaningSession } from '../services';
+import {
+  startCleaningSession,
+  updateKioskCleaningStatus,
+  sendKioskHeartbeat,
+} from '../services';
 import { useResponsive } from '../hooks';
 
 export default function ProgressScreen() {
@@ -53,14 +57,38 @@ export default function ProgressScreen() {
 
     const duration = selectedService.durationMinutes;
 
+    // Notify monitoring platform that cleaning cycle has officially started
+    updateKioskCleaningStatus(state.orderId, 'in_progress');
+    sendKioskHeartbeat({
+      doorLocked: true,
+      currentOrderId: state.orderId,
+      currentActivity: `Starting ${selectedService.name} cycle...`,
+      status: 'busy',
+    });
+
     // Start machine session simulation (or ESP32 connection in future)
     const stopSession = startCleaningSession(
       duration,
       (status) => {
         setMachineStatus(status);
         dispatch({ type: 'UPDATE_MACHINE_STATUS', status });
+
+        // Transmit live progress heartbeat to Monitoring Platform
+        sendKioskHeartbeat({
+          doorLocked: true,
+          currentOrderId: state.orderId,
+          currentActivity: `${status.currentStep} (${status.progressPercent}%)`,
+          status: 'busy',
+        });
       },
       () => {
+        updateKioskCleaningStatus(state.orderId, 'completed');
+        sendKioskHeartbeat({
+          doorLocked: false,
+          currentOrderId: state.orderId,
+          currentActivity: 'Wash cycle completed. Chamber door unlocked.',
+          status: 'online',
+        });
         dispatch({ type: 'SET_CLEANING_COMPLETE' });
         router.replace('/complete');
       }
@@ -69,10 +97,17 @@ export default function ProgressScreen() {
     return () => {
       stopSession();
     };
-  }, [selectedService, dispatch, router]);
+  }, [selectedService, dispatch, router, state.orderId]);
 
   // Developer simulation helper to complete immediately
   const handleFastForward = () => {
+    updateKioskCleaningStatus(state.orderId, 'completed');
+    sendKioskHeartbeat({
+      doorLocked: false,
+      currentOrderId: state.orderId,
+      currentActivity: 'Wash cycle completed. Chamber door unlocked.',
+      status: 'online',
+    });
     dispatch({ type: 'SET_CLEANING_COMPLETE' });
     router.replace('/complete');
   };

@@ -34,6 +34,8 @@ import {
   createDigitalPayment,
   checkPaymentStatus,
   simulateCustomerScanAndPay,
+  recordKioskTransaction,
+  sendKioskHeartbeat,
 } from '../services';
 import { DigitalPaymentDetails } from '../types';
 import { useResponsive } from '../hooks';
@@ -81,14 +83,33 @@ export default function PaymentProcessingScreen() {
     (sourceId: string) => {
       stopPolling();
       stopCountdown();
+      const txId = `pm_${sourceId}`;
       dispatch({
         type: 'SET_PAYMENT_STATUS',
         status: 'completed',
-        transactionId: `pm_${sourceId}`,
+        transactionId: txId,
       });
+
+      // Synchronize order with KixCleen Monitoring Platform
+      recordKioskTransaction({
+        orderId: state.orderId,
+        shoeCategory: state.selectedShoeCategory,
+        service: state.selectedService,
+        addons: state.selectedAddons,
+        totalPrice: state.totalPrice,
+        paymentMethod: state.paymentMethod,
+        transactionId: txId,
+        channel: 'QR Ph',
+      });
+      sendKioskHeartbeat({
+        doorLocked: false,
+        currentOrderId: state.orderId,
+        currentActivity: `Order #${state.orderId} paid via Dynamic QR Ph. Chamber reserved.`,
+      });
+
       router.replace('/payment-confirmation');
     },
-    [dispatch, router, stopCountdown, stopPolling]
+    [dispatch, router, state, stopCountdown, stopPolling]
   );
 
   const initDigitalPayment = useCallback(async () => {
@@ -173,6 +194,24 @@ export default function PaymentProcessingScreen() {
           status: 'completed',
           transactionId: result.transactionId,
         });
+
+        // Synchronize order with KixCleen Monitoring Platform
+        recordKioskTransaction({
+          orderId: state.orderId,
+          shoeCategory: state.selectedShoeCategory,
+          service: state.selectedService,
+          addons: state.selectedAddons,
+          totalPrice: state.totalPrice,
+          paymentMethod: 'ewallet',
+          transactionId: result.transactionId,
+          channel,
+        });
+        sendKioskHeartbeat({
+          doorLocked: false,
+          currentOrderId: state.orderId,
+          currentActivity: `Order #${state.orderId} paid ₱${state.totalPrice} via ${channel}`,
+        });
+
         router.replace('/payment-confirmation');
       } else {
         setErrorMessage(result.message);
@@ -209,6 +248,25 @@ export default function PaymentProcessingScreen() {
           status: 'completed',
           transactionId: result.transactionId,
         });
+
+        // Synchronize cash transaction with KixCleen Monitoring Platform
+        const channelName = method === 'coins' ? 'Coin Slot' : 'Bill Acceptor';
+        recordKioskTransaction({
+          orderId: state.orderId,
+          shoeCategory: state.selectedShoeCategory,
+          service: state.selectedService,
+          addons: state.selectedAddons,
+          totalPrice: state.totalPrice,
+          paymentMethod: method,
+          transactionId: result.transactionId,
+          channel: channelName,
+        });
+        sendKioskHeartbeat({
+          doorLocked: false,
+          currentOrderId: state.orderId,
+          currentActivity: `Order #${state.orderId} paid ₱${state.totalPrice} via ${channelName}`,
+        });
+
         router.replace('/payment-confirmation');
       } else {
         setErrorMessage(result.message);

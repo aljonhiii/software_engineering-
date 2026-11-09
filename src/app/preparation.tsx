@@ -3,7 +3,7 @@
  * Customer prepares and loads their shoes into the chamber before the machine activates.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -24,6 +24,7 @@ import {
 import { useOrder } from '../store/orderStore';
 import { PrimaryButton, Card, ScreenHeader } from '../components/common';
 import { useResponsive } from '../hooks';
+import { sendKioskHeartbeat } from '../services';
 
 export default function PreparationScreen() {
   const router = useRouter();
@@ -33,7 +34,21 @@ export default function PreparationScreen() {
   const [doorChecked, setDoorChecked] = useState(false);
   const [lacesChecked, setLacesChecked] = useState(false);
 
+  useEffect(() => {
+    sendKioskHeartbeat({
+      doorLocked: false,
+      currentOrderId: state.orderId,
+      currentActivity: `Customer loading footwear for Order #${state.orderId}`,
+    });
+  }, [state.orderId]);
+
   const handleReadyToStart = () => {
+    sendKioskHeartbeat({
+      doorLocked: true,
+      currentOrderId: state.orderId,
+      currentActivity: `Chamber sealed & locked for Order #${state.orderId}`,
+      status: 'busy',
+    });
     router.replace('/progress');
   };
 

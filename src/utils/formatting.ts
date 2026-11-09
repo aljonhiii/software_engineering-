@@ -23,9 +23,9 @@ export function formatDuration(minutes: number): string {
   return `${minutes} minutes`;
 }
 
-/** Generate a simple unique ID for orders/sessions */
+/** Generate a unique ID for orders/sessions (KIX-YYYYMMDD-XXXX) */
 export function generateId(): string {
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 8);
-  return `${timestamp}-${random}`;
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const randomNum = Math.floor(1000 + Math.random() * 9000);
+  return `KIX-${dateStr}-${randomNum}`;
 }

@@ -25,6 +25,7 @@ import { useOrder } from '../store/orderStore';
 import { PrimaryButton, Card } from '../components/common';
 import { formatPrice } from '../utils';
 import { useResponsive } from '../hooks';
+import { sendKioskHeartbeat } from '../services';
 
 export default function CompleteScreen() {
   const router = useRouter();
@@ -39,6 +40,12 @@ export default function CompleteScreen() {
   const [secondsRemaining, setSecondsRemaining] = useState<number>(6);
 
   const handleFinish = useCallback(() => {
+    sendKioskHeartbeat({
+      doorLocked: false,
+      currentOrderId: null,
+      currentActivity: 'Idle - Ready for customer',
+      status: 'online',
+    });
     dispatch({ type: 'RESET_SESSION' });
     router.replace('/');
   }, [dispatch, router]);

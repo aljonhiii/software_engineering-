@@ -6,3 +6,8 @@ export {
   simulateCustomerScanAndPay,
   hasConfiguredXenditKeys,
 } from './xenditService';
+export {
+  recordKioskTransaction,
+  updateKioskCleaningStatus,
+  sendKioskHeartbeat,
+} from './kioskMonitoringService';
