@@ -132,14 +132,14 @@ export default function CompleteScreen() {
             <View style={styles.receiptRow}>
               <Text style={styles.receiptLabel}>Shoe Category</Text>
               <Text style={styles.receiptVal}>
-                {state.selectedShoeCategory?.name || 'Standard Footwear'}
+                {state.selectedShoeCategory?.name || 'Other Shoes'}
               </Text>
             </View>
 
             <View style={styles.receiptRow}>
               <Text style={styles.receiptLabel}>Cleaning Program</Text>
               <Text style={styles.receiptVal}>
-                {state.selectedService?.name || 'Standard Clean'}
+                {state.selectedService?.name || 'Sanitation'}
               </Text>
             </View>
 

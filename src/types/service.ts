@@ -4,13 +4,7 @@
  */
 
 /** Available shoe categories */
-export type ShoeCategoryId =
-  | 'sneakers'
-  | 'canvas'
-  | 'leather'
-  | 'suede'
-  | 'sports'
-  | 'other';
+export type ShoeCategoryId = 'leather' | 'other';
 
 /** A shoe category definition */
 export interface ShoeCategory {
@@ -23,7 +17,7 @@ export interface ShoeCategory {
 }
 
 /** Available cleaning service tiers */
-export type ServiceTier = 'quick' | 'standard' | 'deep';
+export type ServiceTier = 'sanitation' | 'disinfection' | 'deodorize';
 
 /** A cleaning service option */
 export interface CleaningService {

@@ -9,10 +9,10 @@ import { AppConfig } from '../constants';
 
 /** Cleaning stages with their progress ranges and labels */
 const CLEANING_STAGES: { state: MachineState; label: string; progressStart: number; progressEnd: number }[] = [
-  { state: 'preparing', label: 'Preparing machine...', progressStart: 0, progressEnd: 10 },
-  { state: 'cleaning', label: 'Cleaning in progress...', progressStart: 10, progressEnd: 60 },
-  { state: 'rinsing', label: 'Rinsing...', progressStart: 60, progressEnd: 80 },
-  { state: 'drying', label: 'Drying...', progressStart: 80, progressEnd: 95 },
+  { state: 'preparing', label: 'Preparing chamber...', progressStart: 0, progressEnd: 10 },
+  { state: 'cleaning', label: 'Sanitation & Disinfection in progress...', progressStart: 10, progressEnd: 60 },
+  { state: 'rinsing', label: 'Deodorizing shoes...', progressStart: 60, progressEnd: 80 },
+  { state: 'drying', label: 'UV Light & Drying...', progressStart: 80, progressEnd: 95 },
   { state: 'completed', label: 'Cleaning complete!', progressStart: 95, progressEnd: 100 },
 ];
 

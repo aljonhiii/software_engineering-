@@ -38,17 +38,22 @@ export function ShoeCategoryCard({
       onPress={() => onSelect(category)}
       activeOpacity={0.88}
     >
-      {/* Selection pill indicator if selected */}
-      {isSelected && (
-        <View style={styles.selectedBadge}>
-          <Ionicons name="checkmark" size={12} color="#FFFFFF" />
-          <Text style={styles.selectedBadgeText}>Selected</Text>
+      {/* Category Badge */}
+      <View style={styles.topRow}>
+        <View style={styles.categoryBadge}>
+          <Text style={styles.categoryBadgeText}>{category.badge}</Text>
         </View>
-      )}
+        {isSelected && (
+          <View style={styles.selectedBadge}>
+            <Ionicons name="checkmark" size={12} color="#FFFFFF" />
+            <Text style={styles.selectedBadgeText}>Selected</Text>
+          </View>
+        )}
+      </View>
 
       {/* Shoe Illustration Container */}
       <View style={styles.illustrationContainer}>
-        <ShoeIllustration categoryId={category.id} size={120} />
+        <ShoeIllustration categoryId={category.id} size={135} />
       </View>
 
       {/* Text & Action Row */}
@@ -56,12 +61,13 @@ export function ShoeCategoryCard({
         <Text style={styles.title} numberOfLines={1}>
           {category.name}
         </Text>
-        <Text style={styles.subtitle} numberOfLines={1}>
-          ( Fast & Deep clean )
+        <Text style={styles.description} numberOfLines={3}>
+          {category.description}
         </Text>
 
         <View style={styles.bottomRow}>
           <View style={styles.priceContainer}>
+            <Text style={styles.startingLabel}>Starts at </Text>
             <Text style={styles.currencySymbol}>₱ </Text>
             <Text style={styles.priceValue}>{basePrice.toFixed(2)}</Text>
           </View>
@@ -100,10 +106,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     ...Shadows.glow(Colors.primary),
   },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.xs,
+  },
+  categoryBadge: {
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+  },
+  categoryBadgeText: {
+    fontSize: 11,
+    fontWeight: Typography.semiBold,
+    color: '#475569',
+  },
   selectedBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
@@ -111,7 +131,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: BorderRadius.full,
-    zIndex: 10,
   },
   selectedBadgeText: {
     fontSize: 10,
@@ -122,23 +141,24 @@ const styles = StyleSheet.create({
   illustrationContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: Spacing.xs,
-    minHeight: 95,
+    paddingVertical: Spacing.sm,
+    minHeight: 110,
   },
   detailsContainer: {
     marginTop: Spacing.xs,
   },
   title: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: Typography.bold,
     color: Colors.textPrimary,
-    marginBottom: 2,
+    marginBottom: 4,
   },
-  subtitle: {
-    fontSize: 12,
-    fontWeight: Typography.medium,
+  description: {
+    fontSize: 13,
+    fontWeight: Typography.regular,
     color: '#64748B',
-    marginBottom: Spacing.sm,
+    lineHeight: 18,
+    marginBottom: Spacing.md,
   },
   bottomRow: {
     flexDirection: 'row',
@@ -149,6 +169,11 @@ const styles = StyleSheet.create({
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
+  },
+  startingLabel: {
+    fontSize: 12,
+    fontWeight: Typography.medium,
+    color: '#64748B',
   },
   currencySymbol: {
     fontSize: 13,

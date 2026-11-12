@@ -61,8 +61,7 @@ export default function ShoeTypeScreen() {
     router.back();
   };
 
-  const isThreeCols = shoeTypeColumns === 3;
-  const isTwoCols = shoeTypeColumns === 2;
+  const isTwoCols = shoeTypeColumns >= 2;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -113,11 +112,10 @@ export default function ShoeTypeScreen() {
             />
           )}
 
-          {/* Shoe Categories Grid */}
+          {/* Shoe Categories Grid (2 Main Categories) */}
           <View
             style={[
               styles.grid,
-              isThreeCols && styles.gridThreeCols,
               isTwoCols && styles.gridTwoCols,
             ]}
           >
@@ -126,7 +124,6 @@ export default function ShoeTypeScreen() {
                 key={category.id}
                 style={[
                   styles.cardWrapper,
-                  isThreeCols && styles.cardWrapperThree,
                   isTwoCols && styles.cardWrapperTwo,
                 ]}
               >
@@ -232,27 +229,21 @@ const styles = StyleSheet.create({
   },
   grid: {
     flexDirection: 'column',
-    gap: Spacing.sm,
-    marginTop: Spacing.xs,
+    gap: Spacing.md,
+    marginTop: Spacing.sm,
   },
   gridTwoCols: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.sm,
-  },
-  gridThreeCols: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.sm,
+    justifyContent: 'space-between',
+    alignItems: 'stretch',
+    gap: Spacing.md,
   },
   cardWrapper: {
     width: '100%',
   },
   cardWrapperTwo: {
-    width: '48.5%',
-  },
-  cardWrapperThree: {
-    width: '32%',
+    flex: 1,
+    maxWidth: '49%',
   },
   bottomBar: {
     position: 'absolute',

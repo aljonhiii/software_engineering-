@@ -73,7 +73,7 @@ export default function PaymentConfirmationScreen() {
             <View style={styles.receiptRow}>
               <Text style={styles.receiptLabel}>Shoe Category</Text>
               <Text style={styles.receiptValue}>
-                {state.selectedShoeCategory?.name || 'Standard Footwear'}
+                {state.selectedShoeCategory?.name || 'Other Shoes'}
               </Text>
             </View>
 

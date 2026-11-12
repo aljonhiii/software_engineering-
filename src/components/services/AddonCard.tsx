@@ -1,9 +1,9 @@
 /**
  * AddonCard component for selecting optional cleaning add-ons.
- * Includes toggle checkbox and pricing information with clean white card styling.
+ * Clean, typography-driven row with toggle checkbox and clear pricing.
  */
 
-import React from 'react';
+import React from 'react';  
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ServiceAddon } from '../../types';
@@ -17,17 +17,6 @@ interface AddonCardProps {
 }
 
 export function AddonCard({ addon, isSelected, onToggle }: AddonCardProps) {
-  const getIconName = (): keyof typeof Ionicons.glyphMap => {
-    switch (addon.icon) {
-      case 'leaf':
-        return 'leaf-outline';
-      case 'water':
-        return 'shield-checkmark-outline';
-      default:
-        return 'add-circle-outline';
-    }
-  };
-
   return (
     <TouchableOpacity
       style={[
@@ -37,18 +26,9 @@ export function AddonCard({ addon, isSelected, onToggle }: AddonCardProps) {
       onPress={() => onToggle(addon)}
       activeOpacity={0.85}
     >
-      <View style={styles.leftSection}>
-        <View style={[styles.iconWrapper, isSelected && styles.iconWrapperSelected]}>
-          <Ionicons
-            name={getIconName()}
-            size={22}
-            color={isSelected ? '#FFFFFF' : Colors.primary}
-          />
-        </View>
-        <View style={styles.textContainer}>
-          <Text style={styles.name}>{addon.name}</Text>
-          <Text style={styles.description}>{addon.description}</Text>
-        </View>
+      <View style={styles.textContainer}>
+        <Text style={styles.name}>{addon.name}</Text>
+        <Text style={styles.description}>{addon.description}</Text>
       </View>
 
       <View style={styles.rightSection}>
@@ -73,10 +53,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: Colors.cardWhite,
     borderRadius: 14,
-    padding: Spacing.md,
-    borderWidth: 1.5,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderWidth: 2,
     borderColor: '#E2E8F0',
-    minHeight: 72,
+    minHeight: 74,
     ...Shadows.small,
   },
   containerSelected: {
@@ -84,36 +65,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     ...Shadows.glow(Colors.primary),
   },
-  leftSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  textContainer: {
     flex: 1,
     marginRight: Spacing.md,
   },
-  iconWrapper: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: 'rgba(2, 132, 199, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: Spacing.sm,
-  },
-  iconWrapperSelected: {
-    backgroundColor: Colors.primary,
-  },
-  textContainer: {
-    flex: 1,
-  },
   name: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: Typography.bold,
     color: Colors.textPrimary,
   },
   description: {
-    fontSize: 12,
-    color: '#64748B',
-    marginTop: 2,
+    fontSize: 13,
+    color: '#475569',
+    marginTop: 3,
+    lineHeight: 18,
   },
   rightSection: {
     flexDirection: 'row',
@@ -121,7 +86,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   price: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: Typography.bold,
     color: Colors.textPrimary,
   },
@@ -129,8 +94,8 @@ const styles = StyleSheet.create({
     color: Colors.primary,
   },
   checkbox: {
-    width: 22,
-    height: 22,
+    width: 24,
+    height: 24,
     borderRadius: 6,
     borderWidth: 2,
     borderColor: '#CBD5E1',

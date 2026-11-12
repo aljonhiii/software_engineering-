@@ -20,9 +20,9 @@ interface StepItem {
 
 const STEPS: StepItem[] = [
   { key: 'preparing', label: 'Preparation', icon: 'settings-outline' },
-  { key: 'cleaning', label: 'Cleaning & Wash', icon: 'water-outline' },
-  { key: 'rinsing', label: 'Rinsing', icon: 'sparkles-outline' },
-  { key: 'drying', label: 'Drying', icon: 'sunny-outline' },
+  { key: 'cleaning', label: 'Sanitize / Disinfect', icon: 'shield-checkmark-outline' },
+  { key: 'rinsing', label: 'Deodorizing', icon: 'leaf-outline' },
+  { key: 'drying', label: 'UV Light & Dryer', icon: 'sunny-outline' },
 ];
 
 export function StepProgress({ currentState }: StepProgressProps) {

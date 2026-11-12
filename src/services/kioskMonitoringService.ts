@@ -63,9 +63,9 @@ export async function recordKioskTransaction(params: RecordTransactionParams): P
     const payload = {
       orderId: params.orderId,
       kioskId: AppConfig.kioskId,
-      shoeType: params.shoeCategory?.name || 'Standard Footwear',
-      serviceTier: params.service?.id || 'standard',
-      serviceName: params.service?.name || 'Standard Clean',
+      shoeType: params.shoeCategory?.name || 'Other Shoes',
+      serviceTier: params.service?.id || 'sanitation',
+      serviceName: params.service?.name || 'Sanitation',
       addons: addonsList,
       basePrice,
       addonsPrice,

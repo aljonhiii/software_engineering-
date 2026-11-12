@@ -394,12 +394,8 @@ export function CleatsIllustration({ size = 120 }: ShoeProps) {
 }
 
 const REAL_SHOE_IMAGES: Record<ShoeCategoryId, any> = {
-  sneakers: require('../../assets/shoes/sneakers.png'),
-  canvas: require('../../assets/shoes/canvas.png'),
   leather: require('../../assets/shoes/leather.png'),
-  suede: require('../../assets/shoes/suede.png'),
-  sports: require('../../assets/shoes/sports.png'),
-  other: require('../../assets/shoes/other.png'),
+  other: require('../../assets/shoes/sneakers.png'),
 };
 
 /** Unified ShoeIllustration Renderer */
@@ -426,19 +422,11 @@ export function ShoeIllustration({
   }
 
   switch (categoryId) {
-    case 'sneakers':
-      return <SneakerIllustration size={size} />;
-    case 'canvas':
-      return <CanvasIllustration size={size} />;
-    case 'suede':
-      return <SuedeIllustration size={size} />;
     case 'leather':
       return <LeatherIllustration size={size} />;
-    case 'sports':
-      return <SportsIllustration size={size} />;
     case 'other':
     default:
-      return <CleatsIllustration size={size} />;
+      return <SneakerIllustration size={size} />;
   }
 }
 

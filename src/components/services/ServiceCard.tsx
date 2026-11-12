@@ -1,11 +1,10 @@
 /**
  * ServiceCard component for displaying a cleaning service tier.
- * Styled with elevated white card and vibrant blue/teal accents.
+ * Clean, typography-first card layout without decorative icons or jargon.
  */
 
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { CleaningService } from '../../types';
 import { Colors, Typography, Spacing, BorderRadius, Shadows } from '../../constants';
 import { formatPrice, formatDuration } from '../../utils';
@@ -17,19 +16,6 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ service, isSelected, onSelect }: ServiceCardProps) {
-  const getIconName = (): keyof typeof Ionicons.glyphMap => {
-    switch (service.icon) {
-      case 'flash':
-        return 'flash-outline';
-      case 'sparkles':
-        return 'sparkles-outline';
-      case 'diamond':
-        return 'shield-checkmark-outline';
-      default:
-        return 'water-outline';
-    }
-  };
-
   return (
     <TouchableOpacity
       style={[
@@ -39,44 +25,34 @@ export function ServiceCard({ service, isSelected, onSelect }: ServiceCardProps)
       onPress={() => onSelect(service)}
       activeOpacity={0.88}
     >
-      {/* Selection Badge Header */}
-      <View style={styles.header}>
-        <View style={[styles.iconContainer, isSelected && styles.iconContainerSelected]}>
-          <Ionicons
-            name={getIconName()}
-            size={26}
-            color={isSelected ? '#FFFFFF' : Colors.primary}
-          />
-        </View>
-        <View style={styles.badgeRow}>
-          <View style={styles.durationBadge}>
-            <Ionicons name="time-outline" size={13} color="#64748B" />
-            <Text style={styles.durationText}>{formatDuration(service.durationMinutes)}</Text>
-          </View>
-          <View style={[styles.radio, isSelected && styles.radioSelected]}>
-            {isSelected && <View style={styles.radioInner} />}
+      <View>
+        {/* Top Row: Service Name, Duration & Radio */}
+        <View style={styles.header}>
+          <Text style={styles.title}>{service.name}</Text>
+          <View style={styles.badgeRow}>
+            <View style={[styles.durationBadge, isSelected && styles.durationBadgeSelected]}>
+              <Text style={[styles.durationText, isSelected && styles.durationTextSelected]}>
+                {formatDuration(service.durationMinutes)}
+              </Text>
+            </View>
+            <View style={[styles.radio, isSelected && styles.radioSelected]}>
+              {isSelected && <View style={styles.radioInner} />}
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Title & Description */}
-      <Text style={styles.title}>{service.name}</Text>
-      <Text style={styles.description} numberOfLines={2}>
-        {service.description}
-      </Text>
+        {/* Plain, readable description (never truncated) */}
+        <Text style={styles.description}>{service.description}</Text>
 
-      {/* Feature List */}
-      <View style={styles.featureList}>
-        {service.features.map((feature, index) => (
-          <View key={index} style={styles.featureItem}>
-            <Ionicons
-              name="checkmark-circle"
-              size={16}
-              color={isSelected ? Colors.primary : Colors.accent}
-            />
-            <Text style={styles.featureText}>{feature}</Text>
-          </View>
-        ))}
+        {/* Concise Feature List */}
+        <View style={styles.featureList}>
+          {service.features.map((feature, index) => (
+            <View key={index} style={styles.featureItem}>
+              <View style={[styles.bulletDot, isSelected && styles.bulletDotSelected]} />
+              <Text style={styles.featureText}>{feature}</Text>
+            </View>
+          ))}
+        </View>
       </View>
 
       {/* Price Footer */}
@@ -94,11 +70,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.cardWhite,
-    borderRadius: 18,
+    borderRadius: 16,
     padding: Spacing.lg,
     borderWidth: 2,
     borderColor: '#E2E8F0',
-    minHeight: 250,
+    minHeight: 220,
     justifyContent: 'space-between',
     ...Shadows.card,
   },
@@ -111,18 +87,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
-  iconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: 'rgba(2, 132, 199, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconContainerSelected: {
-    backgroundColor: Colors.primary,
+  title: {
+    fontSize: 20,
+    fontWeight: Typography.bold,
+    color: Colors.textPrimary,
+    letterSpacing: -0.2,
   },
   badgeRow: {
     flexDirection: 'row',
@@ -130,18 +101,21 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
   },
   durationBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#F1F5F9',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: BorderRadius.full,
-    gap: 4,
+  },
+  durationBadgeSelected: {
+    backgroundColor: 'rgba(2, 132, 199, 0.1)',
   },
   durationText: {
     fontSize: Typography.caption,
-    color: '#64748B',
-    fontWeight: Typography.medium,
+    color: '#475569',
+    fontWeight: Typography.semiBold,
+  },
+  durationTextSelected: {
+    color: Colors.primary,
   },
   radio: {
     width: 22,
@@ -151,7 +125,7 @@ const styles = StyleSheet.create({
     borderColor: '#CBD5E1',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: Spacing.xs,
+    marginLeft: 4,
   },
   radioSelected: {
     borderColor: Colors.primary,
@@ -162,31 +136,36 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: Colors.primary,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: Typography.bold,
-    color: Colors.textPrimary,
-    marginTop: Spacing.xs,
-  },
   description: {
-    fontSize: 13,
-    color: '#64748B',
+    fontSize: 14,
+    color: '#475569',
     marginTop: 4,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   featureList: {
     marginVertical: Spacing.md,
-    gap: 6,
+    gap: 8,
   },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
+  },
+  bulletDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#94A3B8',
+  },
+  bulletDotSelected: {
+    backgroundColor: Colors.primary,
   },
   featureText: {
+    flex: 1,
     fontSize: 13,
     color: Colors.textPrimary,
     fontWeight: Typography.regular,
+    lineHeight: 18,
   },
   footer: {
     flexDirection: 'row',
@@ -199,10 +178,10 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: '#64748B',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    fontWeight: Typography.bold,
+    fontWeight: Typography.semiBold,
   },
   priceValue: {
     fontSize: 22,

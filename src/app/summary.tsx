@@ -108,7 +108,7 @@ export default function OrderSummaryScreen() {
                   <View style={styles.itemLeft}>
                     <Text style={styles.itemLabelSmall}>Shoe Category</Text>
                     <Text style={styles.itemName}>
-                      {state.selectedShoeCategory ? state.selectedShoeCategory.name : 'Standard Footwear'}
+                      {state.selectedShoeCategory ? state.selectedShoeCategory.name : 'Other Shoes'}
                     </Text>
                     <Text style={styles.itemMeta}>
                       {state.selectedShoeCategory?.materialCareNote}

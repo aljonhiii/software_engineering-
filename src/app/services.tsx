@@ -96,7 +96,7 @@ export default function ServicesScreen() {
         <View style={[styles.contentContainer, { maxWidth: contentMaxWidth }]}>
           <ScreenHeader
             title="SELECT CLEANING SERVICE"
-            subtitle="Choose the cleaning intensity program tailored for your selected footwear"
+            subtitle="Choose one service for your shoes, plus any optional add-ons below"
           />
 
           {validationError && (
@@ -107,7 +107,7 @@ export default function ServicesScreen() {
           )}
 
           {/* Cleaning Packages Section */}
-          <Text style={styles.sectionTitle}>1. Cleaning Program</Text>
+          <Text style={styles.sectionTitle}>1. Choose a Service</Text>
           <View
             style={[
               styles.servicesGrid,
@@ -132,7 +132,7 @@ export default function ServicesScreen() {
           </View>
 
           {/* Optional Add-ons Section */}
-          <Text style={styles.sectionTitle}>2. Optional Extra Care</Text>
+          <Text style={styles.sectionTitle}>2. Optional Add-Ons</Text>
           <View
             style={[
               styles.addonsGrid,

@@ -38,12 +38,10 @@ export function useResponsive(): ResponsiveInfo {
   // Dynamic padding based on device size
   const horizontalPadding = isTablet ? (isLandscape ? 32 : 24) : 16;
 
-  // Shoe Category Grid Columns (6 cards total)
+  // Shoe Category Grid Columns (2 standardized main categories: Leather Shoes & Other Shoes)
   let shoeTypeColumns = 1;
-  if (isLandscape || (isTablet && width >= 800)) {
-    shoeTypeColumns = 3; // 2 rows of 3 cards
-  } else if (isTablet || width >= 500) {
-    shoeTypeColumns = 2; // 3 rows of 2 cards
+  if (isLandscape || isTablet || width >= 540) {
+    shoeTypeColumns = 2; // 1 row of 2 side-by-side cards
   }
 
   // Service Cards (Quick, Standard, Deep)
