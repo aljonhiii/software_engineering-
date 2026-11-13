@@ -17,7 +17,7 @@ import {
   TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing, AppConfig, setStoredKioskId } from '../constants';
 import { registerShoecleanOrigin } from '../services/kioskMonitoringService';
@@ -27,11 +27,23 @@ import { WelcomeSlideshow, KixCleenLogo } from '../components/common';
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ kioskId?: string; kiosk_id?: string }>();
+  const deepLinkKioskId = params.kioskId || params.kiosk_id;
   const { isTablet, isLandscape, contentMaxWidth, horizontalPadding } = useResponsive();
   const { dispatch } = useOrder();
   const [currentKioskId, setCurrentKioskId] = useState<string>(AppConfig.kioskId);
   const [isConfigModalOpen, setIsConfigModalOpen] = useState<boolean>(false);
   const [modalKioskInput, setModalKioskInput] = useState<string>(AppConfig.kioskId);
+
+  // If a deep link is received (e.g. from Expo Go exp://... or URL query), apply it immediately
+  useEffect(() => {
+    if (deepLinkKioskId && typeof deepLinkKioskId === 'string' && deepLinkKioskId.trim()) {
+      const clean = deepLinkKioskId.trim().toUpperCase();
+      setStoredKioskId(clean);
+      setCurrentKioskId(clean);
+      setModalKioskInput(clean);
+    }
+  }, [deepLinkKioskId]);
 
   // Ensure state is completely fresh for a new transaction whenever landing on Welcome
   useEffect(() => {

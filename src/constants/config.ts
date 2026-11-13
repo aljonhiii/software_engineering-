@@ -30,15 +30,21 @@ function resolveHostUrl(envUrl: string | undefined, defaultPort: number, pathSuf
 }
 
 const STORAGE_KIOSK_KEY = 'kixcleen_kiosk_id';
+let runtimeKioskId: string | null = null;
 
 /**
  * Dynamically resolves the active Kiosk ID:
- * 1. URL search parameter (?kioskId=... or ?kiosk_id=...) on Web
- * 2. Local storage persistent setting (kixcleen_kiosk_id)
- * 3. Environment variable (EXPO_PUBLIC_KIOSK_ID)
- * 4. Default fallback ('KIOSK-01-MAIN')
+ * 1. Runtime memory override (set by deep link or on-device modal)
+ * 2. URL search parameter (?kioskId=... or ?kiosk_id=...) on Web
+ * 3. Local storage persistent setting (kixcleen_kiosk_id)
+ * 4. Environment variable (EXPO_PUBLIC_KIOSK_ID)
+ * 5. Default fallback ('KIOSK-01-MAIN')
  */
 export function getResolvedKioskId(): string {
+  if (runtimeKioskId) {
+    return runtimeKioskId;
+  }
+
   if (Platform.OS === 'web' && typeof window !== 'undefined') {
     try {
       const urlParams = new URLSearchParams(window.location.search);
@@ -64,9 +70,10 @@ export function getResolvedKioskId(): string {
  * Allows switching the active Kiosk ID in development/runtime.
  */
 export function setStoredKioskId(kioskId: string): void {
+  const clean = kioskId.trim().toUpperCase();
+  runtimeKioskId = clean;
   if (Platform.OS === 'web' && typeof window !== 'undefined') {
     try {
-      const clean = kioskId.trim().toUpperCase();
       localStorage.setItem(STORAGE_KIOSK_KEY, clean);
       const url = new URL(window.location.href);
       url.searchParams.set('kioskId', clean);
