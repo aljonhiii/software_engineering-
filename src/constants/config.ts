@@ -7,17 +7,26 @@ import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
 function resolveHostUrl(envUrl: string | undefined, defaultPort: number, pathSuffix = ''): string {
-  const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
+  let host = 'localhost';
+
+  if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.hostname) {
+    // If opened on a tablet / phone via LAN IP (e.g. 192.168.1.4), talk to the backend on that same host IP!
+    host = window.location.hostname;
+  } else {
+    const debuggerHost = Constants.expoConfig?.hostUri?.split(':')[0];
+    if (debuggerHost) {
+      host = debuggerHost;
+    }
+  }
 
   if (envUrl && envUrl.trim() !== '') {
-    if (Platform.OS !== 'web' && debuggerHost && envUrl.includes('localhost')) {
-      return envUrl.replace('localhost', debuggerHost);
+    if (envUrl.includes('localhost') && host !== 'localhost') {
+      return envUrl.replace('localhost', host);
     }
     return envUrl;
   }
 
-  const targetHost = Platform.OS !== 'web' && debuggerHost ? debuggerHost : 'localhost';
-  return `http://${targetHost}:${defaultPort}${pathSuffix}`;
+  return `http://${host}:${defaultPort}${pathSuffix}`;
 }
 
 const STORAGE_KIOSK_KEY = 'kixcleen_kiosk_id';
