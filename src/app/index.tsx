@@ -85,20 +85,6 @@ export default function WelcomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={[styles.contentWrapper, { maxWidth: contentMaxWidth }]}>
-          {/* Active Terminal Machine Identity Badge */}
-          <TouchableOpacity
-            style={styles.machineBadge}
-            onPress={handleOpenConfig}
-            activeOpacity={0.8}
-            accessibilityLabel="Configured Kiosk Machine ID"
-          >
-            <View style={styles.onlineDot} />
-            <Text style={styles.machineBadgeText}>
-              Machine ID: <Text style={styles.machineBadgeBold}>{currentKioskId}</Text>
-            </Text>
-            <Ionicons name="hardware-chip-outline" size={13} color="#64748B" />
-          </TouchableOpacity>
-
           {/* Brand Logo directly above machine illustration */}
           <View style={[styles.logoWrapper, isTablet && styles.logoWrapperTablet]}>
             <KixCleenLogo isTablet={isTablet} />
@@ -111,6 +97,16 @@ export default function WelcomeScreen() {
           />
         </View>
       </ScrollView>
+
+      {/* Discrete Kiosk Terminal Hardware Label (Lower Left Bottom) */}
+      <TouchableOpacity
+        style={styles.terminalLabel}
+        onPress={handleOpenConfig}
+        activeOpacity={0.6}
+        accessibilityLabel={`Kiosk Identifier ${currentKioskId}`}
+      >
+        <Text style={styles.terminalLabelText}>{currentKioskId}</Text>
+      </TouchableOpacity>
 
       {/* Terminal Machine ID Configuration Modal (Touch-friendly for Tablets & Mobile) */}
       <Modal
@@ -180,33 +176,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 2,
   },
-  machineBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#F1F5F9',
-    borderColor: '#E2E8F0',
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    marginBottom: 8,
+  terminalLabel: {
+    position: 'absolute',
+    bottom: Platform.OS === 'web' ? 14 : 10,
+    left: 16,
+    zIndex: 20,
+    paddingVertical: 2,
+    paddingHorizontal: 2,
   },
-  onlineDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: '#10B981',
-  },
-  machineBadgeText: {
+  terminalLabelText: {
     fontSize: 11,
-    color: '#64748B',
-    letterSpacing: 0.3,
-  },
-  machineBadgeBold: {
-    fontWeight: '700',
-    color: '#0F172A',
+    fontWeight: '500',
+    color: '#94A3B8',
+    letterSpacing: 0.5,
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    textTransform: 'uppercase',
   },
   logoWrapper: {
     alignItems: 'center',
