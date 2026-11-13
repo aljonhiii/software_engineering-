@@ -7,4 +7,4 @@ export {
   calculateTotal,
   getCategoryCareHint,
 } from './services';
-export { AppConfig } from './config';
+export { AppConfig, getResolvedKioskId, setStoredKioskId } from './config';
