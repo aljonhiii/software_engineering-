@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing, AppConfig, setStoredKioskId } from '../constants';
+import { registerShoecleanOrigin } from '../services/kioskMonitoringService';
 import { useOrder } from '../store/orderStore';
 import { useResponsive } from '../hooks';
 import { WelcomeSlideshow, KixCleenLogo } from '../components/common';
@@ -32,6 +33,7 @@ export default function WelcomeScreen() {
   useEffect(() => {
     dispatch({ type: 'RESET_SESSION' });
     setCurrentKioskId(AppConfig.kioskId);
+    registerShoecleanOrigin();
   }, [dispatch]);
 
   const handleSwitchKiosk = () => {

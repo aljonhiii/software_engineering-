@@ -175,3 +175,26 @@ export async function sendKioskHeartbeat(telemetry: TelemetryParams): Promise<bo
     return false;
   }
 }
+
+/**
+ * Register active web origin with the backend launcher auto-discovery hub.
+ */
+export async function registerShoecleanOrigin(): Promise<void> {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    try {
+      await fetch(`${AppConfig.apiBaseUrl}/launcher/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          origin: window.location.origin,
+          kioskId: AppConfig.kioskId,
+          appName: 'shoeclean',
+        }),
+      });
+    } catch {
+      // Non-blocking
+    }
+  }
+}
