@@ -58,7 +58,8 @@ type OrderAction =
   | { type: 'SET_CLEANING_COMPLETE' }
   | { type: 'SET_ERROR'; message: string }
   | { type: 'CLEAR_ERROR' }
-  | { type: 'RESET_SESSION' };
+  | { type: 'RESET_SESSION' }
+  | { type: 'NEW_ORDER_ID' };
 
 // ─── Reducer ────────────────────────────────────────────────────────
 
@@ -110,6 +111,16 @@ function orderReducer(state: OrderState, action: OrderAction): OrderState {
 
     case 'RESET_SESSION':
       return { ...initialState, orderId: generateId() };
+
+    // Keep the customer's selections but start a new order number (the old one was cancelled)
+    case 'NEW_ORDER_ID':
+      return {
+        ...state,
+        orderId: generateId(),
+        paymentStatus: 'pending',
+        transactionId: null,
+        error: null,
+      };
 
     default:
       return state;

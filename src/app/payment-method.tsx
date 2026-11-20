@@ -27,6 +27,7 @@ import { PrimaryButton, ErrorBanner, ScreenHeader } from '../components/common';
 import { formatPrice } from '../utils';
 import { PaymentMethod } from '../types';
 import { useResponsive } from '../hooks';
+import { cancelOpenOrder, updateOpenOrderPaymentMethod } from '../services';
 
 export default function PaymentMethodScreen() {
   const router = useRouter();
@@ -57,6 +58,7 @@ export default function PaymentMethodScreen() {
     setSelectedMethod(method);
     setErrorMessage(null);
     dispatch({ type: 'SET_PAYMENT_METHOD', method });
+    updateOpenOrderPaymentMethod(state.orderId, method);
   };
 
   const handleContinue = () => {
@@ -69,6 +71,12 @@ export default function PaymentMethodScreen() {
 
   const handleBack = () => {
     router.back();
+  };
+
+  // The order was confirmed on the summary screen, so let the owner see the cancellation
+  const handleCancel = () => {
+    cancelOpenOrder();
+    router.replace('/');
   };
 
   const isThreeCols = paymentColumns === 3;
@@ -85,7 +93,7 @@ export default function PaymentMethodScreen() {
           <Text style={styles.stepIndicator}>Step 5 of 10: Payment Method</Text>
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={() => router.replace('/')}
+            onPress={handleCancel}
             activeOpacity={0.7}
           >
             <Text style={styles.cancelButtonText}>Cancel</Text>

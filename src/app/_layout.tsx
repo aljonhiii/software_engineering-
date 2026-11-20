@@ -10,8 +10,14 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { OrderProvider } from '../store/orderStore';
 import { Colors } from '../constants';
+import { reportInterruptedOrderFromPreviousSession } from '../services/openOrderTracker';
 
 export default function RootLayout() {
+  // An order still open from before this app/page load was interrupted (reload, crash, closed tab)
+  useEffect(() => {
+    reportInterruptedOrderFromPreviousSession();
+  }, []);
+
   useEffect(() => {
     if (Platform.OS === 'web' && typeof document !== 'undefined') {
       const fontId = 'kixcleen-google-fonts';

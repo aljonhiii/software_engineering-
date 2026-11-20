@@ -21,6 +21,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing, AppConfig, setStoredKioskId } from '../constants';
 import { registerShoecleanOrigin } from '../services/kioskMonitoringService';
+import { cancelOpenOrder, interruptActiveWash } from '../services/openOrderTracker';
 import { useOrder } from '../store/orderStore';
 import { useResponsive } from '../hooks';
 import { WelcomeSlideshow, KixCleenLogo } from '../components/common';
@@ -47,6 +48,9 @@ export default function WelcomeScreen() {
 
   // Ensure state is completely fresh for a new transaction whenever landing on Welcome
   useEffect(() => {
+    // Landing here with a confirmed-but-unpaid order means it was interrupted
+    cancelOpenOrder();
+    interruptActiveWash();
     dispatch({ type: 'RESET_SESSION' });
     setCurrentKioskId(AppConfig.kioskId);
     setModalKioskInput(AppConfig.kioskId);

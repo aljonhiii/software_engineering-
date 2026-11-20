@@ -102,11 +102,67 @@ export async function recordKioskTransaction(params: RecordTransactionParams): P
 }
 
 /**
+ * Report an order the customer cancelled after confirming it but before payment completed.
+ * The monitoring backend stores it as a cancelled record (no revenue) so owners can see it.
+ */
+export async function reportKioskOrderCancelled(
+  params: Omit<RecordTransactionParams, 'transactionId' | 'channel'>
+): Promise<boolean> {
+  try {
+    const basePrice = params.service?.price || 0;
+    const addonsList = (params.addons || []).map((a) => ({
+      id: a.id,
+      name: a.name,
+      price: a.price,
+    }));
+    const addonsPrice = addonsList.reduce((sum, a) => sum + a.price, 0);
+
+    const payload = {
+      orderId: params.orderId,
+      kioskId: AppConfig.kioskId,
+      shoeType: params.shoeCategory?.name || 'Other Shoes',
+      serviceTier: params.service?.id || 'sanitation',
+      serviceName: params.service?.name || 'Sanitation',
+      addons: addonsList,
+      basePrice,
+      addonsPrice,
+      totalAmount: params.totalPrice,
+      paymentMethod: params.paymentMethod || 'none',
+      paymentStatus: 'cancelled',
+      paymentRef: null,
+      cleaningStatus: 'cancelled',
+    };
+
+    console.log(`[MonitoringService] Reporting cancelled order #${params.orderId}`);
+
+    const response = await fetch(`${AppConfig.apiBaseUrl}/transactions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.warn('[MonitoringService] Backend rejected cancelled order:', errText);
+      return false;
+    }
+
+    console.log(`✅ [MonitoringService] Cancelled order #${params.orderId} reported to monitoring backend`);
+    return true;
+  } catch (err: any) {
+    console.warn('[MonitoringService] Network error reporting cancelled order:', err.message);
+    return false;
+  }
+}
+
+/**
  * Update the cleaning status of an active transaction (e.g. 'in_progress', 'completed').
  */
 export async function updateKioskCleaningStatus(
   orderId: string,
-  cleaningStatus: 'pending' | 'in_progress' | 'completed'
+  cleaningStatus: 'pending' | 'in_progress' | 'completed' | 'cancelled'
 ): Promise<boolean> {
   try {
     console.log(`[MonitoringService] Updating cleaningStatus of #${orderId} to '${cleaningStatus}'`);

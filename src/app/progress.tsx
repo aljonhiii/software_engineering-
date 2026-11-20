@@ -4,7 +4,7 @@
  * timer countdown, and simulated machine status integration.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -31,6 +31,9 @@ import {
   startCleaningSession,
   updateKioskCleaningStatus,
   sendKioskHeartbeat,
+  markWashStarted,
+  markWashFinished,
+  interruptActiveWash,
 } from '../services';
 import { useResponsive } from '../hooks';
 
@@ -49,6 +52,16 @@ export default function ProgressScreen() {
   // Machine status state
   const [machineStatus, setMachineStatus] = useState<MachineStatus>(state.machineStatus);
 
+  // If this screen goes away before the wash finished (Back, navigation, error), the wash was interrupted
+  const washFinishedRef = useRef(false);
+  useEffect(() => {
+    return () => {
+      if (!washFinishedRef.current) {
+        interruptActiveWash();
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (!selectedService) {
       router.replace('/');
@@ -58,6 +71,7 @@ export default function ProgressScreen() {
     const duration = selectedService.durationMinutes;
 
     // Notify monitoring platform that cleaning cycle has officially started
+    markWashStarted(state.orderId);
     updateKioskCleaningStatus(state.orderId, 'in_progress');
     sendKioskHeartbeat({
       doorLocked: true,
@@ -82,6 +96,8 @@ export default function ProgressScreen() {
         });
       },
       () => {
+        washFinishedRef.current = true;
+        markWashFinished(state.orderId);
         updateKioskCleaningStatus(state.orderId, 'completed');
         sendKioskHeartbeat({
           doorLocked: false,
@@ -101,6 +117,8 @@ export default function ProgressScreen() {
 
   // Developer simulation helper to complete immediately
   const handleFastForward = () => {
+    washFinishedRef.current = true;
+    markWashFinished(state.orderId);
     updateKioskCleaningStatus(state.orderId, 'completed');
     sendKioskHeartbeat({
       doorLocked: false,

@@ -35,6 +35,8 @@ import {
   checkPaymentStatus,
   simulateCustomerScanAndPay,
   recordKioskTransaction,
+  cancelOpenOrder,
+  markOrderPaid,
   sendKioskHeartbeat,
 } from '../services';
 import { DigitalPaymentDetails } from '../types';
@@ -51,6 +53,14 @@ export default function PaymentProcessingScreen() {
 
   const method = state.paymentMethod || 'coins';
   const totalPrice = state.totalPrice;
+  const hasOrder = !!state.selectedService;
+
+  // After a reload (or opening this URL directly) there is no order to pay for: go home
+  useEffect(() => {
+    if (!hasOrder) {
+      router.replace('/');
+    }
+  }, [hasOrder, router]);
 
   // Cash accumulator for coins or bills
   const [cashInserted, setCashInserted] = useState<number>(0);
@@ -91,6 +101,7 @@ export default function PaymentProcessingScreen() {
       });
 
       // Synchronize order with KixCleen Monitoring Platform
+      markOrderPaid(state.orderId);
       recordKioskTransaction({
         orderId: state.orderId,
         shoeCategory: state.selectedShoeCategory,
@@ -153,7 +164,7 @@ export default function PaymentProcessingScreen() {
   useEffect(() => {
     let isCancelled = false;
 
-    if (method === 'ewallet') {
+    if (method === 'ewallet' && hasOrder) {
       const timer = setTimeout(() => {
         if (!isCancelled) {
           initDigitalPayment();
@@ -172,7 +183,7 @@ export default function PaymentProcessingScreen() {
       stopPolling();
       stopCountdown();
     };
-  }, [initDigitalPayment, method, stopCountdown, stopPolling]);
+  }, [initDigitalPayment, method, hasOrder, stopCountdown, stopPolling]);
 
   const handleSimulateInstantPay = async (channel: 'GCash' | 'Maya' | 'QR Ph' = 'QR Ph') => {
     if (!digitalDetails) return;
@@ -196,6 +207,7 @@ export default function PaymentProcessingScreen() {
         });
 
         // Synchronize order with KixCleen Monitoring Platform
+        markOrderPaid(state.orderId);
         recordKioskTransaction({
           orderId: state.orderId,
           shoeCategory: state.selectedShoeCategory,
@@ -250,6 +262,7 @@ export default function PaymentProcessingScreen() {
         });
 
         // Synchronize cash transaction with KixCleen Monitoring Platform
+        markOrderPaid(state.orderId);
         const channelName = method === 'coins' ? 'Coin Slot' : 'Bill Acceptor';
         recordKioskTransaction({
           orderId: state.orderId,
@@ -280,11 +293,22 @@ export default function PaymentProcessingScreen() {
     }
   };
 
+  const handleCancel = () => {
+    stopPolling();
+    stopCountdown();
+    cancelOpenOrder();
+    router.replace('/');
+  };
+
   const formatCountdown = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
+
+  if (!hasOrder) {
+    return null;
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -303,7 +327,7 @@ export default function PaymentProcessingScreen() {
           <Text style={styles.stepIndicator}>Step 6 of 10: Payment Processing</Text>
           <TouchableOpacity
             style={styles.cancelButton}
-            onPress={() => router.replace('/')}
+            onPress={handleCancel}
             disabled={isVerifying}
             activeOpacity={0.7}
           >

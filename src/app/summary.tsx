@@ -3,7 +3,7 @@
  * Displays selected shoe type, cleaning package, itemized pricing, and EDIT & CONFIRM ORDER actions.
  */
 
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -25,6 +25,7 @@ import { useOrder } from '../store/orderStore';
 import { PrimaryButton, ScreenHeader, Card } from '../components/common';
 import { formatPrice, formatDuration } from '../utils';
 import { useResponsive } from '../hooks';
+import { markOrderOpen, hasOpenOrder, cancelOpenOrder } from '../services';
 
 export default function OrderSummaryScreen() {
   const router = useRouter();
@@ -33,7 +34,7 @@ export default function OrderSummaryScreen() {
     horizontalPadding,
     summaryTwoColumn,
   } = useResponsive();
-  const { state } = useOrder();
+  const { state, dispatch } = useOrder();
 
   // If user navigated directly or state was cleared, redirect safely in useEffect
   useEffect(() => {
@@ -42,11 +43,30 @@ export default function OrderSummaryScreen() {
     }
   }, [state.selectedService, router]);
 
+  // Returning here (Back button, back gesture or browser Back) after confirming means the
+  // customer left the payment step: report that order as cancelled and give them a new number.
+  useFocusEffect(
+    useCallback(() => {
+      if (hasOpenOrder(state.orderId)) {
+        cancelOpenOrder();
+        dispatch({ type: 'NEW_ORDER_ID' });
+      }
+    }, [state.orderId, dispatch])
+  );
+
   if (!state.selectedService) {
     return null;
   }
 
   const handleConfirmOrder = () => {
+    markOrderOpen({
+      orderId: state.orderId,
+      shoeCategory: state.selectedShoeCategory,
+      service: state.selectedService,
+      addons: state.selectedAddons,
+      totalPrice: state.totalPrice,
+      paymentMethod: state.paymentMethod,
+    });
     router.push('/payment-method');
   };
 
